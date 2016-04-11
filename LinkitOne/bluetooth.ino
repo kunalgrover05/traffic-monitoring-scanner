@@ -1,9 +1,9 @@
+""" This program scans for Bluetooth devices in the vicinity of LinkIt One Microcontroller. It scans once in every three seconds for such devices""""
 #include <LBT.h>
 #include <LBTClient.h>
 #include <SPI.h>
 #include <LSD.h>
 #include <Time.h>
-
 
 LFile mbt;
 
