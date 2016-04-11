@@ -20,6 +20,7 @@ if (!mbt)
   Serial.println("error opening mbt.txt");
 }
 mbt.close();
+"""ERROR: Whenever tested, code returned an error message saying it couldn't open the file. Needs to be addressed""""
 Serial.printf("LBT start\n");
 bool success = LBTClient.begin();
 if(!success)
