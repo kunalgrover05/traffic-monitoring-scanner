@@ -4,7 +4,7 @@
 #include <SPI.h>
 #include <LSD.h>
 #include <Time.h>
-
+""" Declaring a file to be stored on the sd card """
 LFile mbt;
 
 void setup() {
@@ -15,6 +15,7 @@ LSD.begin();
 
 mbt = LSD.open("mac.txt", FILE_WRITE);
 if (!mbt)
+
 {
   Serial.println("error opening mbt.txt");
 }
