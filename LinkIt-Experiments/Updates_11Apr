@@ -1,4 +1,21 @@
 Results
 
+Device detects upto a range of 22-24m comfortably even with objects in the way.
+
+Sitting in the bus had negligible effect on the range.
+
+With scan time set as 3 seconds, nearby devices were scanned comfortablyo
+
+On serial monitor, results of the scan were displayed normally
+
 
 Issues
+
+Number of devices being detected per scan wasn't consistent
+Taking the union of MAC addresses after 2-3 scans gives a more accurate number of BT devices.
+
+Device can detect at max. 10 devices per scan ( according to th website).
+
+Device cannot distinguish between a vehicle and a person on the pavement.
+
+Even though data is to be sent to mbt.txt file on sd card, an error props up, saying it can't open such a file.
