@@ -14,21 +14,17 @@ void setup() {
     LSD.begin();
 
     mbt = LSD.open("mac.txt", FILE_WRITE);
-    if (!mbt)
-
-    {
+    if (!mbt){
       Serial.println("error opening mbt.txt");
     }
     mbt.close();
     Serial.printf("LBT start\n");
     bool success = LBTClient.begin();
-    if(!success)
-    {
+    if(!success){
       Serial.printf("Cannot begin Bluetooth Client successfully\n");
       delay(0xffffffff); 
     }
-    else
-    {
+    else{
       Serial.printf("Bluetooth Client begin successfully\n");
    
     }
@@ -42,13 +38,11 @@ void loop() {
    mbt = LSD.open("mac.txt", FILE_WRITE);
    mbt.printf("Time: %d\n",time);
    Serial.printf("Time: %d for devices %d\n",time,num);
-   for(int i=0; i<num;i++)
-   { 
+   for(int i=0; i<num;i++){
   
      LBTDeviceInfo info = {0};
       bool succ = LBTClient.getDeviceInfo(i, &info);
-      if (succ)
-      {
+      if (succ){
        mbt.printf("[%02x:%02x:%02x:%02x:%02x:%02x][%s]\n", 
         info.address.nap[1], info.address.nap[0], info.address.uap, info.address.lap[2], info.address.lap[1], info.address.lap[0],
         info.name);
