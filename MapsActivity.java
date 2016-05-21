@@ -64,8 +64,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double inlat = 0.0, inlong = 0.0, finlat = 0.0,  finlong = 0.0;
     int state = 0, errorcode=0;
     /*
-     *errorcode=1 POST failure HUE_GREEN
-     *errorcode=2 GET failure HUE_YELLOW
+     *errorcode=2 GET-route failure HUE_YELLOW
+     *errorcode=1 GET-markers failure
      */
     List<Double> initialpos = Arrays.asList(inlat,inlong);
     List<Double> finalpos = Arrays.asList(finlat,finlong);
@@ -80,74 +80,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        /**
+         * Getting node locations from server
+         */
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ROOT_URL).build();
+        HttpRequest api = restAdapter.create(HttpRequest.class);
+        api.getMarkers(new Callback<ServerData>() {
+            @Override
+            public void success(ServerData serverData, Response response) {
+                int i=0;
+                for(List<Double> loc : serverData.getPointList()){
+                    devpos.add(i,new LatLng(loc.get(0),loc.get(1)));
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                errorcode=1;
+            }
+        });
     }
     //This method is called in onMarkerClick along with drawroute()
     private void putData(){
         RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(ROOT_URL).build();
         HttpRequest api = restAdapter.create(HttpRequest.class);
-//        api.putData(initialpos,finalpos,new Callback<ServerData>() {
-//            @Override
-//            public void success(ServerData serverData, Response response) {
-////                if(state==1)
-////                serverData.setIntialPoint(initialpos);
-////                //serverData.setFinalPoint(finalpos);
-////                else if(state==2){
-////                    serverData.setIntialPoint(initialpos);
-////                    serverData.setFinalPoint(finalpos);
-////                }
-//            }
-//
-//            @Override
-//            public void failure(RetrofitError error) {
-//                if(state!=0)
-//                for(Marker marker: devices){
-//                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-//                }
-//
-//
-//            }
-//        });
-        api.putData(initialpos, finalpos, new Callback<ServerData>() {
+        api.getData(initialpos, finalpos, new Callback<ServerData>() {
             @Override
             public void success(ServerData serverData, Response response) {
-
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if(state!=0)
-                for(Marker marker: devices){
-                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-                }
-                errorcode=1;
-            }
-        });
-
-
-        api.getData(new Callback<ServerData>() {
-            @Override
-            public void success(ServerData serverData, Response response) {
-                route.add(0,new LatLng(serverData.getPoint1().get(0),serverData.getPoint1().get(1)));
-                route.add(1,new LatLng(serverData.getPoint2().get(0),serverData.getPoint2().get(1)));
-                route.add(2,new LatLng(serverData.getPoint3().get(0),serverData.getPoint3().get(1)));
-                route.add(3,new LatLng(serverData.getPoint4().get(0),serverData.getPoint4().get(1)));
-                route.add(4,new LatLng(serverData.getPoint5().get(0),serverData.getPoint5().get(1)));
-                route.add(5,new LatLng(serverData.getPoint6().get(0),serverData.getPoint6().get(1)));
-                route.add(6,new LatLng(serverData.getPoint7().get(0),serverData.getPoint7().get(1)));
-                route.add(7,new LatLng(serverData.getPoint8().get(0),serverData.getPoint8().get(1)));
-                route.add(8,new LatLng(serverData.getPoint9().get(0),serverData.getPoint9().get(1)));
-                route.add(9,new LatLng(serverData.getPoint10().get(0),serverData.getPoint10().get(1)));
-                route.add(10,new LatLng(serverData.getPoint11().get(0),serverData.getPoint11().get(1)));
-                route.add(11,new LatLng(serverData.getPoint12().get(0),serverData.getPoint12().get(1)));
-                route.add(12,new LatLng(serverData.getPoint13().get(0),serverData.getPoint13().get(1)));
-                route.add(13,new LatLng(serverData.getPoint14().get(0),serverData.getPoint14().get(1)));
-                route.add(14,new LatLng(serverData.getPoint15().get(0),serverData.getPoint15().get(1)));
-                route.add(15,new LatLng(serverData.getPoint16().get(0),serverData.getPoint16().get(1)));
-                route.add(16,new LatLng(serverData.getPoint17().get(0),serverData.getPoint17().get(1)));
-                route.add(17,new LatLng(serverData.getPoint18().get(0),serverData.getPoint18().get(1)));
-                route.add(18,new LatLng(serverData.getPoint19().get(0),serverData.getPoint19().get(1)));
-                route.add(19,new LatLng(serverData.getPoint20().get(0),serverData.getPoint20().get(1)));
-                route.add(20,new LatLng(serverData.getPoint21().get(0),serverData.getPoint21().get(1)));
+                int i=0;
+                /**
+                 * Getting node locations along shortest route
+                 */
+                for(List<Double> loc: serverData.getPointList()){
+                     route.add(i,new LatLng(loc.get(0),loc.get(1)));
+                     i++;
+                 }
 
 
             }
@@ -179,41 +146,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        int i = 0;
         /**
-         * Here we have initialised devpos and devices
-         * later when LatLng of all devices is available the below values will be changed
+         * Putting markers on map
          */
-        {
-            //Assuming maximum of 21 device are present
-            devpos.add(0, new LatLng(12.9887026, 80.2293583));
-            devpos.add(1, new LatLng(12.9887026, 80.2293583));
-            devpos.add(2, new LatLng(12.9887026, 80.2293583));
-            devpos.add(3, new LatLng(12.9887026, 80.2293583));
-            devpos.add(4, new LatLng(12.9887026, 80.2293583));
-            devpos.add(5, new LatLng(12.9887026, 80.2293583));
-            devpos.add(6, new LatLng(12.9887026, 80.2293583));
-            devpos.add(7, new LatLng(12.9887026, 80.2293583));
-            devpos.add(8, new LatLng(12.9887026, 80.2293583));
-            devpos.add(9, new LatLng(12.9887026, 80.2293583));
-            devpos.add(10, new LatLng(12.9887026, 80.2293583));
-            devpos.add(11, new LatLng(12.9887026, 80.2293583));
-            devpos.add(12, new LatLng(12.9887026, 80.2293583));
-            devpos.add(13, new LatLng(12.9887026, 80.2293583));
-            devpos.add(14, new LatLng(12.9887026, 80.2293583));
-            devpos.add(15, new LatLng(12.9887026, 80.2293583));
-            devpos.add(16, new LatLng(12.9887026, 80.2293583));
-            devpos.add(17, new LatLng(12.9887026, 80.2293583));
-            devpos.add(18, new LatLng(12.9887026, 80.2293583));
-            devpos.add(19, new LatLng(12.9887026, 80.2293583));
-            devpos.add(20, new LatLng(12.9887026, 80.2293583));
-
-            int i = 0;
             for (LatLng Location : devpos) {
                 Marker marker = mMap.addMarker(new MarkerOptions().position(Location).title("Device" + i));
                 devices.add(i, marker);
                 i++;
             }
-        }
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
