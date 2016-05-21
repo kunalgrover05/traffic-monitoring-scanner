@@ -5,19 +5,18 @@ import java.util.List;
 
 import retrofit.http.GET;
 import retrofit.Callback;
-import retrofit.http.POST;
-import retrofit.http.FormUrlEncoded;
-import retrofit.http.Field;
+import retrofit.http.Query;
 /**
- * Created by DK on 5/20/2016.
+ * Created by Karteek Dhara on 5/20/2016.
  */
+
+//The url for all these is same currently but will be changed if necessary.
 public interface HttpRequest {
-    @FormUrlEncoded
-    @POST("/api/?format=json")
-    void putData(@Field("initial_point[]")List<Double> initialPoint,
-                 @Field("final_point[]")List<Double> finalPoint ,Callback<ServerData> uscb);
     @GET("/api/?format=json")
-    void getData(Callback<ServerData> cb);
+    void getMarkers(Callback<ServerData> cb);
+    @GET("/api/?format=json")
+    void getData(@Query("initial_point")List<Double> initialPoint,
+                 @Query("final_point")List<Double> finalPoint, Callback<ServerData> cb);
 
 
 }
